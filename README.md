@@ -1,16 +1,66 @@
-# React + Vite
+# Hebrew Calendar App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based Hebrew calendar application with Redux state management and React Router integration.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 📅 Display Hebrew calendar with Gregorian dates
+- 🔄 Fetch calendar data from Hebcal API
+- ➕ Add custom events to any date
+- 🔍 View events by clicking on event count
+- 🌐 Router support for navigating between months
+- 📱 Responsive grid layout
 
-## React Compiler
+## Technologies Used
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React** - UI library
+- **Redux Toolkit** - State management
+- **React Router** - Client-side routing
+- **Axios** - HTTP client for API requests
+- **Vite** - Build tool and dev server
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+```
+
+## Development
+
+```bash
+npm run dev
+```
+
+Open http://localhost:5173 in your browser.
+
+## Build
+
+```bash
+npm run build
+```
+
+## Usage
+
+### Viewing the Calendar
+- Each day shows Gregorian day number, Hebrew date, and event count
+- Days from previous/next month are shown in lighter color
+
+### Adding Events
+1. Click the + button on any day
+2. Enter event name in the prompt
+3. Event is saved to Redux state
+
+### Viewing Events
+- Click on the event count to see all events for that day
+
+### Navigation
+- URL format: /calendar/:month/:year
+- Example: /calendar/1/2026 shows January 2026
+
+## API
+
+Uses Hebcal API to fetch Hebrew calendar data
+
+## Author
+
+Created as part of React + Redux training exercise

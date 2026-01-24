@@ -1,32 +1,32 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchCalendarData } from './calendarSlice';
 import { Day } from './Day';
 import './Calendar.css';
 
 export function Calendar() {
-  const { month, year } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { month: monthParam, year: yearParam } = useParams();
   const { dates, loading, error } = useSelector((state) => state.calendar);
   const [displayDates, setDisplayDates] = useState([]);
 
-  const monthNum = parseInt(month);
-  const yearNum = parseInt(year);
+  // Get current month and year from URL params or use current date
+  const month = monthParam ? parseInt(monthParam) : new Date().getMonth() + 1;
+  const year = yearParam ? parseInt(yearParam) : new Date().getFullYear();
 
-  // Fetch calendar data when month/year changes
+  // Fetch calendar data on component mount or when month/year changes
   useEffect(() => {
-    if (monthNum && yearNum) {
-      dispatch(fetchCalendarData({ month: monthNum, year: yearNum }));
-    }
-  }, [dispatch, monthNum, yearNum]);
+    dispatch(fetchCalendarData({ month, year }));
+  }, [dispatch, month, year]);
 
   // Update display with proper week alignment
   useLayoutEffect(() => {
     if (Object.keys(dates).length > 0) {
-      const dateKeys = Object.keys(dates).sort();
-      const firstDateStr = dateKeys[0];
-      const firstDate = new Date(firstDateStr + 'T00:00:00');
+      const sortedDates = Object.keys(dates).sort();
+      const firstDateStr = sortedDates[0];
+      const firstDate = new Date(firstDateStr);
       const dayOfWeek = firstDate.getDay(); // 0 = Sunday, 6 = Saturday
 
       const newDisplayDates = [];
@@ -35,32 +35,41 @@ export function Calendar() {
       for (let i = dayOfWeek - 1; i >= 0; i--) {
         const prevDate = new Date(firstDate);
         prevDate.setDate(prevDate.getDate() - (i + 1));
-        newDisplayDates.push(prevDate.toLocaleDateString('en-CA', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        }));
+        newDisplayDates.push({
+          date: prevDate.toLocaleDateString('en-CA', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }),
+          isCurrentMonth: false
+        });
       }
 
       // Add days from current month
-      dateKeys.forEach((date) => {
-        newDisplayDates.push(date);
+      sortedDates.forEach((date) => {
+        newDisplayDates.push({
+          date,
+          isCurrentMonth: true
+        });
       });
 
       // Add days from next month to complete last week
-      const lastDateStr = dateKeys[dateKeys.length - 1];
-      const lastDate = new Date(lastDateStr + 'T00:00:00');
+      const lastDateStr = sortedDates[sortedDates.length - 1];
+      const lastDate = new Date(lastDateStr);
       const lastDayOfWeek = lastDate.getDay();
       const daysNeeded = 6 - lastDayOfWeek;
 
       for (let i = 1; i <= daysNeeded; i++) {
         const nextDate = new Date(lastDate);
         nextDate.setDate(nextDate.getDate() + i);
-        newDisplayDates.push(nextDate.toLocaleDateString('en-CA', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        }));
+        newDisplayDates.push({
+          date: nextDate.toLocaleDateString('en-CA', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }),
+          isCurrentMonth: false
+        });
       }
 
       setDisplayDates(newDisplayDates);
@@ -70,9 +79,13 @@ export function Calendar() {
   if (loading) return <div className="calendar-container">Loading calendar...</div>;
   if (error) return <div className="calendar-container">Error: {error}</div>;
 
-  // Get month name
-  const monthDate = new Date(yearNum, monthNum - 1);
-  const monthName = monthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  // Get month name from first date in dates
+  const firstDateKey = Object.keys(dates)[0];
+  let monthName = '';
+  if (firstDateKey) {
+    const monthDate = new Date(firstDateKey);
+    monthName = monthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  }
 
   return (
     <div className="calendar-container">
@@ -88,11 +101,12 @@ export function Calendar() {
         <div className="day-header">Saturday</div>
 
         {/* Calendar days */}
-        {displayDates.map((date, index) => (
+        {displayDates.map((item, index) => (
           <Day
             key={index}
-            date={date}
-            dateData={dates[date] || { hebrew: date, events: [] }}
+            date={item.date}
+            dateData={dates[item.date] || { hebrew: '', events: [] }}
+            isCurrentMonth={item.isCurrentMonth}
           />
         ))}
       </div>

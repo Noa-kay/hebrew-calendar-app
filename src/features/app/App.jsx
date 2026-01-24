@@ -1,23 +1,23 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Calendar } from '../calendar/Calendar';
-import { CalendarRedirect } from '../calendar/CalendarRedirect';
+import { CalendarRedirect } from './CalendarRedirect';
 import './App.css';
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <div className="App">
         <header className="app-header">
           <h1>Hebrew Calendar</h1>
         </header>
         <main>
           <Routes>
-            <Route path="/" element={<CalendarRedirect />} />
             <Route path="/calendar/:month/:year" element={<Calendar />} />
+            <Route path="*" element={<CalendarRedirect />} />
           </Routes>
         </main>
       </div>
-    </Router>
+    </BrowserRouter>
   );
 }
 

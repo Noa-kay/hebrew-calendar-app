@@ -12,7 +12,7 @@ export const fetchCalendarData = createAsyncThunk(
   'calendar/fetchCalendarData',
   async ({ month, year }, { rejectWithValue }) => {
     try {
-      // Create first and last day of month
+      // Create first and last day of month (JS months are 0-based)
       const firstDay = new Date(year, month - 1, 1);
       const lastDay = new Date(year, month, 0);
 
@@ -33,29 +33,23 @@ export const fetchCalendarData = createAsyncThunk(
         `https://www.hebcal.com/converter?cfg=json&start=${formattedStartDate}&end=${formattedEndDate}&g2h=1`
       );
 
-      // Transform response to map: gregorian date -> array of events
+      // Transform response to map: gregorian date -> hebrew date with events
       const dateMap = {};
       
-      // Initialize all dates with empty arrays
-      const currentDate = new Date(firstDay);
-      while (currentDate <= lastDay) {
-        const dateStr = currentDate.toLocaleDateString('en-CA', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        });
-        dateMap[dateStr] = { hebrew: '', events: [] };
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-
-      // Fill in hebrew dates
-      if (Array.isArray(response.data)) {
-        response.data.forEach((item) => {
-          if (item.greg && dateMap[item.greg]) {
-            dateMap[item.greg].hebrew = item.hebrew || item.greg;
+      response.data.forEach((item) => {
+        if (item.greg) {
+          if (!dateMap[item.greg]) {
+            dateMap[item.greg] = {
+              hebrew: item.hebrew || '',
+              events: []
+            };
           }
-        });
-      }
+          // Store hebrew date
+          if (item.hebrew && !dateMap[item.greg].hebrew) {
+            dateMap[item.greg].hebrew = item.hebrew;
+          }
+        }
+      });
 
       return dateMap;
     } catch (error) {

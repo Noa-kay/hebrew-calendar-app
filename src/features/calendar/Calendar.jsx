@@ -1,23 +1,25 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCalendarData } from './calendarSlice';
 import { Day } from './Day';
 import './Calendar.css';
 
 export function Calendar() {
+  const { month, year } = useParams();
   const dispatch = useDispatch();
   const { dates, loading, error } = useSelector((state) => state.calendar);
   const [displayDates, setDisplayDates] = useState([]);
 
-  // Get current month and year
-  const now = new Date();
-  const currentMonth = now.getMonth() + 1;
-  const currentYear = now.getFullYear();
+  const monthNum = parseInt(month);
+  const yearNum = parseInt(year);
 
-  // Fetch calendar data on component mount
+  // Fetch calendar data when month/year changes
   useEffect(() => {
-    dispatch(fetchCalendarData({ month: currentMonth, year: currentYear }));
-  }, [dispatch, currentMonth, currentYear]);
+    if (monthNum && yearNum) {
+      dispatch(fetchCalendarData({ month: monthNum, year: yearNum }));
+    }
+  }, [dispatch, monthNum, yearNum]);
 
   // Update display with proper week alignment
   useLayoutEffect(() => {
@@ -69,7 +71,7 @@ export function Calendar() {
   if (error) return <div className="calendar-container">Error: {error}</div>;
 
   // Get month name
-  const monthDate = new Date(currentYear, currentMonth - 1);
+  const monthDate = new Date(yearNum, monthNum - 1);
   const monthName = monthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   return (

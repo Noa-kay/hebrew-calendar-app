@@ -5,7 +5,7 @@ import './Day.css';
 export function Day({ date, dateData }) {
   const dispatch = useDispatch();
 
-  const gregorianDate = new Date(date);
+  const gregorianDate = new Date(date + 'T00:00:00');
   const dayOfMonth = gregorianDate.getDate();
   const hebrewDate = dateData?.hebrew || date;
   const events = Array.isArray(dateData?.events) ? dateData.events : [];

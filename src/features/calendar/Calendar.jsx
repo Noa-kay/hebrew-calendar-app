@@ -22,8 +22,9 @@ export function Calendar() {
   // Update display with proper week alignment
   useLayoutEffect(() => {
     if (Object.keys(dates).length > 0) {
-      const firstDateStr = Object.keys(dates)[0];
-      const firstDate = new Date(firstDateStr);
+      const dateKeys = Object.keys(dates).sort();
+      const firstDateStr = dateKeys[0];
+      const firstDate = new Date(firstDateStr + 'T00:00:00');
       const dayOfWeek = firstDate.getDay(); // 0 = Sunday, 6 = Saturday
 
       const newDisplayDates = [];
@@ -40,13 +41,13 @@ export function Calendar() {
       }
 
       // Add days from current month
-      Object.keys(dates).forEach((date) => {
+      dateKeys.forEach((date) => {
         newDisplayDates.push(date);
       });
 
       // Add days from next month to complete last week
-      const lastDateStr = Object.keys(dates)[Object.keys(dates).length - 1];
-      const lastDate = new Date(lastDateStr);
+      const lastDateStr = dateKeys[dateKeys.length - 1];
+      const lastDate = new Date(lastDateStr + 'T00:00:00');
       const lastDayOfWeek = lastDate.getDay();
       const daysNeeded = 6 - lastDayOfWeek;
 

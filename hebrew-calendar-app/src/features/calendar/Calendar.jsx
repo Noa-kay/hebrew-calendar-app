@@ -7,8 +7,8 @@ import './Calendar.css';
 
 export function Calendar() {
   const dispatch = useDispatch();
-  const { month: monthParam, year: yearParam } = useParams();
   const navigate = useNavigate();
+  const { month: monthParam, year: yearParam } = useParams();
   const { dates, loading, error } = useSelector((state) => state.calendar);
   const [displayDates, setDisplayDates] = useState([]);
 
@@ -24,8 +24,7 @@ export function Calendar() {
   // Update display with proper week alignment
   useLayoutEffect(() => {
     if (Object.keys(dates).length > 0) {
-      const sortedEntries = Object.entries(dates).sort(([a], [b]) => a.localeCompare(b));
-      const sortedDates = sortedEntries.map(([date]) => date);
+      const sortedDates = Object.keys(dates).sort();
       const firstDateStr = sortedDates[0];
       const firstDate = new Date(firstDateStr);
       const dayOfWeek = firstDate.getDay(); // 0 = Sunday, 6 = Saturday
@@ -47,7 +46,7 @@ export function Calendar() {
       }
 
       // Add days from current month
-      sortedEntries.forEach(([date]) => {
+      sortedDates.forEach((date) => {
         newDisplayDates.push({
           date,
           isCurrentMonth: true
@@ -88,29 +87,9 @@ export function Calendar() {
     monthName = monthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   }
 
-  const handlePrevMonth = () => {
-    const prevMonth = month === 1 ? 12 : month - 1;
-    const prevYear = month === 1 ? year - 1 : year;
-    navigate(`/calendar/${prevMonth}/${prevYear}`);
-  };
-
-  const handleNextMonth = () => {
-    const nextMonth = month === 12 ? 1 : month + 1;
-    const nextYear = month === 12 ? year + 1 : year;
-    navigate(`/calendar/${nextMonth}/${nextYear}`);
-  };
-
   return (
     <div className="calendar-container">
-      <div className="calendar-header">
-        <button className="nav-btn" onClick={handlePrevMonth}>
-          ◀
-        </button>
-        <h2>{monthName}</h2>
-        <button className="nav-btn" onClick={handleNextMonth}>
-          ▶
-        </button>
-      </div>
+      <h2>{monthName}</h2>
       <div className="calendar-grid">
         {/* Day headers */}
         <div className="day-header">Sunday</div>

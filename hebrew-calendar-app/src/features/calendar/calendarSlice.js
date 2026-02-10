@@ -1,9 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { initialCalendarData } from './initialCalendarData';
 
 const initialState = {
-  dates: initialCalendarData,
+  dates: {},
   loading: false,
   error: null,
 };
@@ -33,13 +32,23 @@ export const fetchCalendarData = createAsyncThunk(
 
       const dateMap = {};
       const data = response.data;
-
-      if (data?.hdates && typeof data.hdates === 'object') {
-        Object.entries(data.hdates).forEach(([greg, info]) => {
-          dateMap[greg] = {
-            hebrew: info?.hebrew || '',
-            events: Array.isArray(info?.events) ? info.events : [],
-          };
+      
+      // Handle both array and object responses
+      const items = Array.isArray(data) ? data : (data.events || Object.values(data));
+      
+      if (Array.isArray(items)) {
+        items.forEach((item) => {
+          if (item.greg) {
+            if (!dateMap[item.greg]) {
+              dateMap[item.greg] = {
+                hebrew: item.hebrew || '',
+                events: []
+              };
+            }
+            if (item.hebrew && !dateMap[item.greg].hebrew) {
+              dateMap[item.greg].hebrew = item.hebrew;
+            }
+          }
         });
       }
 

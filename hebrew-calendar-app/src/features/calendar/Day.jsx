@@ -11,11 +11,9 @@ export function Day({ date, dateData, isCurrentMonth = true }) {
   const events = Array.isArray(dateData?.events) ? dateData.events : [];
 
   const handleShowEvents = () => {
-    if (events.length === 0) {
-      alert('No events for this day.');
-      return;
+    if (events.length > 0) {
+      alert(`Events on ${date}:\n${events.join('\n')}`);
     }
-    alert(`Events on ${date}:\n${events.join('\n')}`);
   };
 
   const handleAddEvent = () => {
@@ -30,9 +28,9 @@ export function Day({ date, dateData, isCurrentMonth = true }) {
       <div className="day-number">{dayOfMonth}</div>
       {hebrewDate && <div className="hebrew-date">{hebrewDate}</div>}
       <div className="event-count" onClick={handleShowEvents}>
-        <span className={`event-link ${events.length === 0 ? 'disabled' : ''}`}>
-          {events.length} event{events.length !== 1 ? 's' : ''}
-        </span>
+        {events.length > 0 && (
+          <span className="event-link">{events.length} event{events.length > 1 ? 's' : ''}</span>
+        )}
       </div>
       <button className="add-event-btn" onClick={handleAddEvent}>
         +

@@ -1,22 +1,14 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { Calendar } from '../calendar/Calendar';
 import { CalendarRedirect } from './CalendarRedirect';
 import './App.css';
 
 function App() {
-  const dates = useSelector((state) => state.calendar.dates);
-  const firstDateKey = Object.keys(dates)[0];
-  const currentMonth = firstDateKey
-    ? new Date(firstDateKey).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-    : '';
-
   return (
     <BrowserRouter>
       <div className="App">
         <header className="app-header">
           <h1>Hebrew Calendar</h1>
-          {currentMonth && <div className="current-month">{currentMonth}</div>}
         </header>
         <main>
           <Routes>
